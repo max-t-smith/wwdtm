@@ -7,6 +7,8 @@ import json
 import random
 import copy
 
+from article import Article
+
 '''
 
 get_articles:
@@ -21,7 +23,7 @@ def get_articles(url):
     out_lst = [] #Initialize the output list
     feed = feedparser.parse(url)
     for article in feed.entries: #loop through the articles and add the info
-        out_lst.append((article.title, article.link, article.content[0].value))
+        out_lst.append(Article(article.title, article.link, article.content[0].value))
     return out_lst
 
 '''
@@ -38,7 +40,7 @@ def get_two_articles(articles, base_prompt, groq_key, model):
     prompt = base_prompt
     prompt += "\n\n"
     for i, article in zip(range(len(articles)),articles):
-        prompt += str(i)+". "+article[2]
+        prompt += str(i)+". "+article.description
 
     g = Groq(api_key=groq_key)
 
@@ -53,7 +55,7 @@ def get_two_articles(articles, base_prompt, groq_key, model):
         json_response = json.loads(response.choices[0].message.content)
         return True, articles[int(json_response["article1"])], articles[int(json_response["article2"])], json_response["connection"]
     except Exception as _:
-        possible_articles = copy.copy(articles)
+        possible_articles = copy.deepcopy(articles)
         a1 = random.choice(possible_articles)
         possible_articles.remove(a1)
         a2 = random.choice(possible_articles)
@@ -203,8 +205,8 @@ def lambda_handler(event, context):
     worldnews_key = config.get('news_sources', 'worldnews_key')
     worldnews_url = config.get('news_sources', 'worldnews_url')
 
-    summary_1 = generate_description(article_1[0], article_1[1], prompt, groq_key, groq_model, worldnews_url, worldnews_key)
-    summary_2 = generate_description(article_2[0], article_2[1], prompt, groq_key, groq_model, worldnews_url, worldnews_key)
+    summary_1 = generate_description(article_1.title, article_1.url, prompt, groq_key, groq_model, worldnews_url, worldnews_key)
+    summary_2 = generate_description(article_2.title, article_2.url, prompt, groq_key, groq_model, worldnews_url, worldnews_key)
 
 
     prompt_file = config.get('news_sources', 'btl_fake_prompt')
@@ -219,14 +221,6 @@ def lambda_handler(event, context):
 
     intro = generate_intro(connection, prompt, groq_key, groq_model)
 
-    print(article_1[1])
-    print(article_2[1])
-    print(connection)
-    print(summary_1)
-    print(summary_2)
-    print(fake_summary)
-    print(intro)
-
     if summary_1 == ""  or summary_2 == "" or fake_summary == "":
         return {
 
@@ -240,10 +234,10 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'body': {
 
-            'intro':intro,
-            'summary_1':summary_1,
-            'summary_2':summary_2,
-            'fake_summary':fake_summary
+            'intro' : intro,
+            'summary_1' : summary_1,
+            'summary_2' : summary_2,
+            'fake_summary' : fake_summary
 
         }
 
