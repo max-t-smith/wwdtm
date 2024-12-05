@@ -5,7 +5,6 @@ import requests
 from groq import Groq
 import json
 import random
-import copy
 
 from article import Article
 
@@ -55,10 +54,9 @@ def get_two_articles(articles, base_prompt, groq_key, model):
         json_response = json.loads(response.choices[0].message.content)
         return True, articles[int(json_response["article1"])], articles[int(json_response["article2"])], json_response["connection"]
     except Exception as _:
-        possible_articles = copy.deepcopy(articles)
-        a1 = random.choice(possible_articles)
-        possible_articles.remove(a1)
-        a2 = random.choice(possible_articles)
+        random.shuffle(articles)
+        a1 = articles[0]
+        a2 = articles[1]
         return False, a1, a2, ""
 
 
@@ -70,13 +68,13 @@ given an article link, summarizes the article in classic WWDTM format
 
 '''
 
-def generate_description(title, article_url, base_prompt, groq_key, model, worldnews_url, worldnews_key):
+def generate_description(article, base_prompt, groq_key, model, worldnews_url, worldnews_key):
     tries = 0
     prompt = base_prompt
     prompt += "\n\n"
     url = worldnews_url
     url+= "?url="
-    url+=article_url
+    url+=article.url
     headers = {
         'x-api-key': worldnews_key
     }
@@ -86,7 +84,7 @@ def generate_description(title, article_url, base_prompt, groq_key, model, world
         return ""
 
     prompt += "title:\n\n"
-    prompt += title
+    prompt += article.title
     prompt += "\n\n"
     prompt += "full artice:\n\n"
     prompt += res.json()["text"]
@@ -205,8 +203,8 @@ def lambda_handler(event, context):
     worldnews_key = config.get('news_sources', 'worldnews_key')
     worldnews_url = config.get('news_sources', 'worldnews_url')
 
-    summary_1 = generate_description(article_1.title, article_1.url, prompt, groq_key, groq_model, worldnews_url, worldnews_key)
-    summary_2 = generate_description(article_2.title, article_2.url, prompt, groq_key, groq_model, worldnews_url, worldnews_key)
+    summary_1 = generate_description(article_1, prompt, groq_key, groq_model, worldnews_url, worldnews_key)
+    summary_2 = generate_description(article_2, prompt, groq_key, groq_model, worldnews_url, worldnews_key)
 
 
     prompt_file = config.get('news_sources', 'btl_fake_prompt')
@@ -225,7 +223,7 @@ def lambda_handler(event, context):
         return {
 
             'statusCode': 500,
-            'body': json.dumps("LLM failed to generate good outputs")
+            'body': "LLM failed to generate good outputs"
 
         }
 
@@ -242,3 +240,5 @@ def lambda_handler(event, context):
         }
 
     }
+
+print(lambda_handler({}, {}))
