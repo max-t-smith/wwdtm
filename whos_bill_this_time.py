@@ -83,8 +83,9 @@ def lambda_handler(event, context):
         if quote_response["status"] == "success":
             num_articles += 1
             del quote_response["status"]
+            quote_response["info"] = article.description
             question_list.append(quote_response)
             if num_articles == 3:
                 return {"statusCode": 200,
                         "body": json.dumps(question_list)}
-    return {"statusCode": 500, "body": "LLM failed to generate enough limericks"}
+    return {"statusCode": 500, "body": "LLM failed to generate enough questions"}

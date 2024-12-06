@@ -4,7 +4,7 @@ Your task is as follows:
 2. Choose the most important word from the article - it should be a noun that is relatively unique to the specific story. It should not be a number or metric. It should not be a person unless 50% or more reasonable americans would know who the person is.
 3. Modify (truncate or ellipses) the quote so it does not include the word in (2), while ensuring the quote still reads well. Choose a new quote or word if this is not possible.
 3. Generate a question beginning in "That was..." to be presented after the quote. The answer to the question
-should be the word you chose in (2). The question should provide as much detail as possible as to the speaker's name, context, etc., without giving away or hinting at the answer
+should be the word you chose in (2). The question should provide as much detail as possible as to the speaker's name, context, etc., without giving away or hinting at the answer. However, since llms are not good with dates, avoid mentioning the year, etc.
 4. Run a test to ensure that the answer is IMPOSSIBLE to guess if you aren't at least somewhat familiar with the story. If it is,
 try again. The quote should not imply the answer, and the question should not imply the answer. The answer should not lie anywhere in the language of the quote or question
 5. Run a test to ensure that the outputs are free of bias/subjectivity. If they aren't, try again
@@ -49,6 +49,12 @@ Example #2:
     "answer": "UFO"
 
 }
+
+Example of a BAD output:
+
+{"quote": "It is rare for a campaign office to be broken into, especially at the local level.", "question": "That was a Loudoun County Sheriff\'s Office statement in December 2023 about an August break-in at a political office in Ashburn, Virginia. What type of facility was burglarized?", "answer": "Campaign office"}
+
+This is bad because the quote contains the answer "Campaign office", so it is super obvious. YOU ARE PROHIBITED FROM OUTPUTTING ANYTHING WHERE SOMETHING LIKE THIS IS THE CASE
 
 Here is the input article:
 

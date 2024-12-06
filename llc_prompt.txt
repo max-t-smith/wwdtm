@@ -5,14 +5,19 @@ Lines 3 and 4 rhyme
 
 Your task is as follows:
 
-1. Choose a single word from the title of the given news article that is the most important, and would not be found in an article about a different topic.
-2. Generate a humorous limerick (adhering to rhyme schemes) where the last word is the word you chose. Lines 1 and 2 rhyme with the word you chose in (1), and lines 3 and 4 rhyme with each other
-3. A user will be tasked with generating the last word of the limerick, so make sure it isn't obvious or way too hard. If the last word of the limerick is too random or too obvious, the limerick is invalid.
-4. Make sure that the answer EXACTLY RHYMES with the end of the first line and the end of the second line. If it doesn't, the limerick is invalid - NO EXCEPTIONS.
-5. Make sure that the end of the third line EXACTLY RHYMES with the end of the fourth line. If it doesn't, the limerick is invalid - NO EXCEPTIONS.
-6. If your limerick is invalid/doesn't meet the requirements (ESPECIALLY if it violates the rhyming rules), doesn't seem enough like the examples, or just isn't good, feel free to return a failure status
+1. Choose a single word from the title of the given news article that is both central to the story and unlikely to be found in an article about a different topic. Avoid overly generic or unimportant words like 'the,' 'and,' or broad nouns such as 'person' or 'thing,' unless they are pivotal to the story. Also avoid simple, trivial nouns and verbs like "could", "say".
 
+2. Generate a humorous limerick (adhering to rhyme schemes) where the last word is the word you chose. Lines 1 and 2 rhyme with the word you chose in (1), and lines 3 and 4 rhyme with each other.
 
+3. A user will be tasked with generating the last word of the limerick, so make sure it isn't obvious or way too hard. Avoid extremes in difficulty: the final word should not be so obscure that it’s unguessable, nor so obvious that it’s trivial to deduce.
+
+4. Ensure the limerick employs humor or clever phrasing that ties directly to the chosen word and topic, making the final word feel rewarding to guess. Guessing the final word should reveal some information about the story, it shouldn't just be another word.
+
+5. Make sure that the answer EXACTLY RHYMES with the end of the first line and the end of the second line. If it doesn't, the limerick is invalid - NO EXCEPTIONS.
+
+6. Make sure that the end of the third line EXACTLY RHYMES with the end of the fourth line. If it doesn't, the limerick is invalid - NO EXCEPTIONS.
+
+8. If your limerick is invalid/doesn't meet the requirements (ESPECIALLY if it violates the rhyming rules), doesn't seem enough like the examples, or just isn't good, feel free to return a failure status.
 
 If you are successful, return in the following json format:
 
