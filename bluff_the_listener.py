@@ -1,4 +1,3 @@
-import feedparser
 from configparser import ConfigParser
 
 import requests
@@ -6,27 +5,9 @@ from groq import Groq
 import json
 import random
 
-from article import Article
+import utilities
 
 '''
-
-get_articles:
-
-returns all of the articles in the UPI Odd News Category as a list of tuples 
-[(article title, artile link, article description)]
-
-'''
-
-
-def get_articles(url):
-    out_lst = [] #Initialize the output list
-    feed = feedparser.parse(url)
-    for article in feed.entries: #loop through the articles and add the info
-        out_lst.append(Article(article.title, article.link, article.content[0].value))
-    return out_lst
-
-'''
-
 get_two_articles
 
 refines a list of articles by finding a common theme between two
@@ -186,7 +167,7 @@ def lambda_handler(event, context):
 
     # Grab all the possible "odd" articles we can work with
     news_url = config.get('news_sources', 'odd_news_url')
-    articles = get_articles(news_url)
+    articles = utilities.get_articles(news_url)
 
     groq_key = config.get('llm', 'groq_key')
     groq_model = config.get('llm', 'groq_model')
@@ -240,5 +221,3 @@ def lambda_handler(event, context):
         }
 
     }
-
-print(lambda_handler({}, {}))

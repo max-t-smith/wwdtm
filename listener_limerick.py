@@ -1,26 +1,23 @@
+import utilities
 from configparser import ConfigParser
+import random
 import requests
 from anthropic import Anthropic
 import json
-import random
-
-import utilities
 
 '''
 
-get_quote
+get_limerick
 
-given an article as a tuple, 
-extracts a quote if possible
-if there is a quote, generates the 
-WBTT question
 
 '''
-
-def get_quote(article, base_prompt, ai_key, ai_model, worldnews_url, worldnews_key):
+def get_limerick(article, base_prompt, ai_key, ai_model, worldnews_url, worldnews_key):
     tries = 0
     prompt = base_prompt
     prompt += "\n\n"
+    prompt += "article title:\n\n"
+    prompt += article.title
+    prompt += "\n\narticle text:\n\n"
     url = worldnews_url
     url += "?url="
     url += article.url
@@ -46,14 +43,13 @@ def get_quote(article, base_prompt, ai_key, ai_model, worldnews_url, worldnews_k
         except Exception as _:
             json_response = {"status": "failure"}
         if "status" in json_response and json_response["status"] == "success":
-            if "quote" in json_response and "question" in json_response and "answer" in json_response:
-                if json_response["quote"] != "" and json_response["question"] != "" and json_response["answer"] != "":
-                    if json_response["answer"] not in json_response["quote"] and json_response["answer"] not in json_response["question"]:
+            if "limerick_1" in json_response and "limerick_2" in json_response and "limerick_3" in json_response and "limerick_4" in json_response and "limerick_5" in json_response and "answer" in json_response:
+                if json_response["limerick_1"] != "" and json_response["limerick_2"] != ""  and json_response["limerick_3"] != "" and json_response["limerick_4"] != "" and json_response["limerick_5"] != "" and json_response["answer"] != "":
+                    if json_response["answer"] not in json_response["limerick_1"] and json_response["answer"] not in json_response["limerick_2"] and json_response["answer"] not in json_response["limerick_3"] and json_response["answer"] not in json_response["limerick_4"] and json_response["answer"] not in json_response["limerick_5"]:
                         return json_response
 
         tries += 1
     return {"status": "failure"}
-
 
 def lambda_handler(event, context):
     # Deal with the config file
@@ -72,19 +68,21 @@ def lambda_handler(event, context):
     anthropic_key = config.get('llm', 'anthropic_key')
     anthropic_model = config.get('llm', 'anthropic_model')
 
-    prompt_file = config.get('news_sources', 'wbtt_prompt')
+    prompt_file = config.get('news_sources', 'llc_prompt')
     with open(prompt_file, 'r') as f:
         prompt = f.read()
 
     question_list = []
 
     for article in articles:
-        quote_response = get_quote(article, prompt, anthropic_key, anthropic_model, worldnews_url, worldnews_key)
-        if quote_response["status"] == "success":
+        limerick_response = get_limerick(article, prompt, anthropic_key, anthropic_model, worldnews_url, worldnews_key)
+        if limerick_response["status"] == "success":
             num_articles += 1
-            del quote_response["status"]
-            question_list.append(quote_response)
+            del limerick_response["status"]
+            question_list.append(limerick_response)
             if num_articles == 3:
                 return {"statusCode": 200,
                         "body": json.dumps(question_list)}
-    return {"statusCode": 500, "body": "LLM failed to generate enough limericks"}
+    return {"statusCode": 500, "body": "LLM failed to generate enough questions"}
+
+print(lambda_handler({}, {}))
