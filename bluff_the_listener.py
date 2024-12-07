@@ -5,8 +5,6 @@ from groq import Groq
 import json
 import random
 
-import utilities
-
 '''
 get_two_articles
 
@@ -158,16 +156,12 @@ def generate_intro(connection, base_prompt, groq_key, model):
             tries += 1
     return ""
 
-def lambda_handler(event, context):
+def btl(articles):
 
     # Deal with the config file
     config_file = "server_config.ini"
     config = ConfigParser()
     config.read(config_file)
-
-    # Grab all the possible "odd" articles we can work with
-    news_url = config.get('news_sources', 'odd_news_url')
-    articles = utilities.get_articles(news_url)
 
     groq_key = config.get('llm', 'groq_key')
     groq_model = config.get('llm', 'groq_model')
@@ -203,15 +197,17 @@ def lambda_handler(event, context):
     if summary_1 == ""  or summary_2 == "" or fake_summary == "":
         return {
 
-            'statusCode': 500,
-            'body': "LLM failed to generate good outputs"
+            'status': 'failure',
 
         }
 
+    articles.remove(article_1)
+    articles.remove(article_2)
+
     return {
 
-        'statusCode': 200,
-        'body': {
+        'status': 'success',
+        'game': {
 
             'intro' : intro,
             'summary_1' : summary_1,
