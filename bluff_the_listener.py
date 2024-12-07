@@ -1,9 +1,8 @@
 from configparser import ConfigParser
 
 import requests
-from groq import Groq
-import json
 import random
+import json
 
 '''
 get_two_articles
@@ -20,18 +19,30 @@ def get_two_articles(articles, base_prompt, groq_key, model):
     for i, article in zip(range(len(articles)),articles):
         prompt += str(i)+". "+article.description
 
-    g = Groq(api_key=groq_key)
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {groq_key}",
+        "Content-Type": "application/json"
+    }
 
-    try:
-        response = g.chat.completions.create(messages=[
+    data = {
+        "messages": [
             {
                 "role": "user",
                 "content": prompt
             }
-        ], model=model, response_format={"type": "json_object"}, presence_penalty=1.0)
+        ],
+        "model": model,
+        "response_format": {"type": "json_object"},
+        "presence_penalty": 1.0
+    }
 
-        json_response = json.loads(response.choices[0].message.content)
-        return True, articles[int(json_response["article1"])], articles[int(json_response["article2"])], json_response["connection"]
+    try:
+        response = requests.post(url, headers=headers, json=data)
+        response.raise_for_status()
+        json_response = response.json()
+        result = json.loads(json_response['choices'][0]['message']['content'])
+        return True, articles[int(result["article1"])], articles[int(result["article2"])], result["connection"]
     except Exception as _:
         random.shuffle(articles)
         a1 = articles[0]
@@ -67,18 +78,30 @@ def generate_description(article, base_prompt, groq_key, model, worldnews_url, w
     prompt += "\n\n"
     prompt += "full artice:\n\n"
     prompt += res.json()["text"]
-    g = Groq(api_key=groq_key)
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {groq_key}",
+        "Content-Type": "application/json"
+    }
+
+    data = {
+        "messages": [
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        "model": model,
+        "response_format": {"type": "json_object"},
+        "presence_penalty": 1.0
+    }
     while tries < 3:
         try:
-            response = g.chat.completions.create(messages=[
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ], model=model, response_format={"type": "json_object"}, presence_penalty=1.0)
-
-            json_response = json.loads(response.choices[0].message.content)
-            summary = json_response["summary"]
+            response = requests.post(url, headers=headers, json=data)
+            response.raise_for_status()
+            json_response = response.json()
+            result = json.loads(json_response['choices'][0]['message']['content'])
+            summary = result["summary"]
             return summary
         except Exception as _:
             tries+=1
@@ -106,18 +129,31 @@ def generate_fake(s1, s2, connection, base_prompt, groq_key, model):
     prompt += "connection between the articles: \n\n"
     prompt += connection
     prompt += "\n\nreturn your fake article summary in the specified json format"
-    g = Groq(api_key=groq_key)
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {groq_key}",
+        "Content-Type": "application/json"
+    }
+
+    data = {
+        "messages": [
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        "model": model,
+        "response_format": {"type": "json_object"},
+        "presence_penalty": 1.0,
+        "temperature": 1.2
+    }
     while tries < 3:
         try:
-            response = g.chat.completions.create(messages=[
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ], model=model, response_format={"type": "json_object"}, presence_penalty=1.0, temperature = 1.2)
-
-            json_response = json.loads(response.choices[0].message.content)
-            summary = json_response["summary"]
+            response = requests.post(url, headers=headers, json=data)
+            response.raise_for_status()
+            json_response = response.json()
+            result = json.loads(json_response['choices'][0]['message']['content'])
+            summary = result["summary"]
             return summary
         except Exception as _:
             tries += 1
@@ -139,18 +175,30 @@ def generate_intro(connection, base_prompt, groq_key, model):
     prompt = base_prompt
     prompt += "\n\n"
     prompt += connection
-    g = Groq(api_key=groq_key)
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {groq_key}",
+        "Content-Type": "application/json"
+    }
+
+    data = {
+        "messages": [
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        "model": model,
+        "response_format": {"type": "json_object"},
+        "presence_penalty": 1.0
+    }
     while tries < 3:
         try:
-            response = g.chat.completions.create(messages=[
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ], model=model, response_format={"type": "json_object"}, presence_penalty=1.0)
-
-            json_response = json.loads(response.choices[0].message.content)
-            intro = json_response["intro"]
+            response = requests.post(url, headers=headers, json=data)
+            response.raise_for_status()
+            json_response = response.json()
+            result = json.loads(json_response['choices'][0]['message']['content'])
+            intro = result["intro"]
             return intro
         except Exception as _:
             tries += 1
@@ -217,3 +265,4 @@ def btl(articles):
         }
 
     }
+

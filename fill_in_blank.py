@@ -1,6 +1,5 @@
 from configparser import ConfigParser
 import requests
-from groq import Groq
 import json
 import random
 
@@ -30,24 +29,36 @@ def get_question(article, base_prompt, ai_key, ai_model, worldnews_url, worldnew
         return {"status": "failure"}
 
     prompt += res.json()["text"]
-    g = Groq(api_key=ai_key)
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {ai_key}",
+        "Content-Type": "application/json"
+    }
+
+    data = {
+        "messages": [
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        "model": ai_model,
+        "response_format": {"type": "json_object"},
+        "presence_penalty": 1.0
+    }
     while tries < 3:
         try:
-            response = g.chat.completions.create(messages=[
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ], model=ai_model, response_format={"type": "json_object"}, presence_penalty=1.0)
-
-            json_response = json.loads(response.choices[0].message.content)
+            response = requests.post(url, headers=headers, json=data)
+            response.raise_for_status()
+            json_response = response.json()
+            result = json.loads(json_response['choices'][0]['message']['content'])
         except Exception as _:
-            json_response = {"status": "failure"}
-        if "status" in json_response and json_response["status"] == "success":
-            if "question" in json_response and "answer" in json_response:
-                if json_response["question"] != "" and json_response["answer"] != "":
-                    if json_response["answer"] not in json_response["question"] and " ____________ " in json_response["question"]:
-                        return json_response
+            result = {"status": "failure"}
+        if "status" in result and result["status"] == "success":
+            if "question" in result and "answer" in result:
+                if result["question"] != "" and result["answer"] != "":
+                    if result["answer"] not in result["question"] and " ____________ " in result["question"]:
+                        return result
 
         tries += 1
     return {"status": "failure"}

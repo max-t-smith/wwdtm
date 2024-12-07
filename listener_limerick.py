@@ -1,7 +1,6 @@
 from configparser import ConfigParser
 import random
 import requests
-from anthropic import Anthropic
 import json
 import pronouncing
 
@@ -62,24 +61,39 @@ def get_limerick(article, base_prompt, ai_key, ai_model, worldnews_url, worldnew
         return {"status": "failure"}
 
     prompt += res.json()["text"]
-    a = Anthropic(api_key=ai_key)
+    url = "https://api.anthropic.com/v1/messages"
+    headers = {
+        "x-api-key": ai_key,
+        "Content-Type": "application/json",
+        "anthropic-version": "2023-06-01"
+    }
+
+    data = {
+        "messages": [
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        "model": ai_model,
+        "max_tokens":8192
+    }
     while tries < 3:
         try:
-            response = a.messages.create(messages=[
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ], model=ai_model, max_tokens=1024)
-            json_response = json.loads(response.content[0].text)
+
+            response = requests.post(url, headers=headers, json=data)
+            response.raise_for_status()
+
+            json_response = response.json()
+            result = json.loads(json_response['content'][0]['text'])
         except Exception as _:
-            json_response = {"status": "failure"}
-        if "status" in json_response and json_response["status"] == "success":
-            if "limerick_1" in json_response and "limerick_2" in json_response and "limerick_3" in json_response and "limerick_4" in json_response and "limerick_5" in json_response and "answer" in json_response:
-                if json_response["limerick_1"] != "" and json_response["limerick_2"] != ""  and json_response["limerick_3"] != "" and json_response["limerick_4"] != "" and json_response["limerick_5"] != "" and json_response["answer"] != "":
-                    if json_response["answer"] not in json_response["limerick_1"] and json_response["answer"] not in json_response["limerick_2"] and json_response["answer"] not in json_response["limerick_3"] and json_response["answer"] not in json_response["limerick_4"] and json_response["answer"] not in json_response["limerick_5"]:
-                        if validate_limerick_rhymes(json_response):
-                            return json_response
+            result = {"status": "failure"}
+        if "status" in result and result["status"] == "success":
+            if "limerick_1" in result and "limerick_2" in result and "limerick_3" in result and "limerick_4" in result and "limerick_5" in result and "answer" in result:
+                if result["limerick_1"] != "" and result["limerick_2"] != ""  and result["limerick_3"] != "" and result["limerick_4"] != "" and result["limerick_5"] != "" and result["answer"] != "":
+                    if result["answer"] not in result["limerick_1"] and result["answer"] not in result["limerick_2"] and result["answer"] not in result["limerick_3"] and result["answer"] not in result["limerick_4"] and result["answer"] not in result["limerick_5"]:
+                        if validate_limerick_rhymes(result):
+                            return result
 
         tries += 1
     return {"status": "failure"}

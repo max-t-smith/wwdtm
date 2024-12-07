@@ -5,8 +5,8 @@ import sys
 
 import datatier
 
-import bluff_the_listener
 import whos_bill_this_time
+import bluff_the_listener
 import listener_limerick
 import fill_in_blank
 
@@ -35,8 +35,8 @@ def lambda_handler(event, context):
 
     random.seed()
 
-    us = event["us"]
-    world = event["world"]
+    us = event["us"] == 'y'
+    world = event["world"] == 'y'
     id = event["id"]
 
     config_file = "server_config.ini"
