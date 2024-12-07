@@ -84,5 +84,5 @@ def fib(articles):
         return {"status": "failure"}
 
     return {"status": "success",
-            "game": json.dumps(question_list)}
+            "game": question_list}
 

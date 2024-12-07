@@ -83,5 +83,5 @@ def wbtt(articles):
             question_list.append(quote_response)
             if num_articles == 3:
                 return {"status": "success",
-                        "game": json.dumps(question_list)}
+                        "game": question_list}
     return {"status": "failure"}

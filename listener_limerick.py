@@ -114,6 +114,6 @@ def llc(articles):
             limerick_list.append(limerick_response)
             if num_articles == 3:
                 return {"status": "success",
-                        "game": json.dumps(limerick_list)}
+                        "game": limerick_list}
     return {"status": "failure"}
 
