@@ -35,9 +35,8 @@ def lambda_handler(event, context):
 
     random.seed()
 
-    us = event["us"] == 'y'
-    world = event["world"] == 'y'
-    id = event["id"]
+    us = True
+    world = True
 
     config_file = "server_config.ini"
     config = ConfigParser()
@@ -54,6 +53,28 @@ def lambda_handler(event, context):
     if dbConn is None:
         print("Unable to connect to DB, exiting")
         sys.exit(0)
+
+    sql = "insert into games(status) values (%s)"
+    output = datatier.perform_action(dbConn, sql, ["Queued"])
+    tries = 0
+    while output == -1 and tries < 3:
+        tries += 1
+        output = datatier.perform_action(dbConn, sql, ["Queued"])
+
+    if output == -1:
+        return
+
+    sql = "select gameid from games where status='Queued' order by gameid desc limit 1"
+    row = datatier.retrieve_one_row(dbConn, sql, [])
+    tries = 0
+    while row is None and tries < 3:
+        tries+=1
+        row = datatier.retrieve_one_row(dbConn, sql, [])
+
+    if row is None:
+        return
+
+    id = row[0]
 
     odd_news_url = config.get('news_sources', 'odd_news_url')
     odd_articles = utilities.get_articles(odd_news_url)
@@ -162,7 +183,6 @@ def lambda_handler(event, context):
     if success:
         update_status(dbConn, id, "success")
 
-lambda_handler({"id":1, "us":True, "world":True},{})
 
 
 

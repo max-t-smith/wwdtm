@@ -32,6 +32,7 @@ CREATE TABLE scores
     scoreid     int not null AUTO_INCREMENT,
     playerid    int not null,
     gameid      int not null,
+    score       int not null,
     PRIMARY KEY (scoreid),
     FOREIGN KEY (playerid) REFERENCES players(playerid),
     FOREIGN KEY (gameid) REFERENCES games(gameid)
