@@ -73,7 +73,7 @@ def lambda_handler(event, context):
     quotes = []
     for quote in results:
         quotes.append(
-            {"id": quote[0], "quote": limerick[2], "question": limerick[3], "answer": limerick[4]})
+            {"id": quote[0], "quote": quote[2], "question": quote[3]})
 
     # Get the fill-in-the-blanks
 
@@ -88,7 +88,7 @@ def lambda_handler(event, context):
     for fill_in_blank in results:
         fill_in_blanks.append(
 
-            {"id":fill_in_blank[0], "question":fill_in_blank[2], "answer":fill_in_blank[3]}
+            {"id":fill_in_blank[0], "question":fill_in_blank[2]}
         )
 
     # Get the bluff the listener challenge
@@ -105,10 +105,10 @@ def lambda_handler(event, context):
     bluff_the_listener = {"id":results[0], "intro":results[2], "summaries":summaries}
 
     sql = "insert into scores(playerid, gameid, score) values (%s, %s, 0)"
-    result = datatier.perform_action(sql, userid, id)
+    result = datatier.perform_action(dbConn, sql, [userid, id])
     if result == -1 or result == 0:
         return {'statusCode':500, 'body':'error with DB'}
 
-    return {'statusCode': 200, 'body': json.dumps({'btl':bluff_the_listener, 'llc':limericks, 'wbtt':quotes, 'fib':fill_in_blanks})}
+    return {'statusCode': 200, 'body': json.dumps({'id':id,'btl':bluff_the_listener, 'llc':limericks, 'wbtt':quotes, 'fib':fill_in_blanks})}
 
 

@@ -105,7 +105,7 @@ def lambda_handler(event, context):
         return {'statusCode': 400, 'body':'bad request: no body'}
 
     #body = json.loads(event["body"])
-    body = event["body"]
+    body = json.loads(event["body"])
 
     if "challenge_type" not in body or "challengeid" not in body or "answer" not in body or "playerid" not in body or "gameid" not in body:
         return {'statusCode': 400, 'body':'bad request: body doesn\'t include the right info'}
@@ -113,6 +113,7 @@ def lambda_handler(event, context):
     type = body["challenge_type"]
     challengeid = int(body["challengeid"])
     playerid = int(body["playerid"])
+    gameid = int(body["gameid"])
     answer = body["answer"]
     info = ''
     if type == "llc" or type == "wbtt" or type == 'fitb':
@@ -149,18 +150,9 @@ def lambda_handler(event, context):
 
     points = potential_points if correct else 0
 
-    sql = "update scores set points = points + %s where playerid = %s and gameid = %s"
+    sql = "update scores set score = score + %s where playerid = %s and gameid = %s"
     result = datatier.perform_action(dbConn, sql, [points, playerid, gameid])
-    if result == -1 or result == 0:
+    if result == -1:
         return {'statusCode': 400, 'body':'selected user has not started game'}
 
     return {'statusCode': 200, 'body': json.dumps({'correct': correct, 'points':points,'info': info, 'correct_answer': correct_answer})}
-
-
-challenge_type = "btl"
-challengeid = 6
-playerid = 4
-answer = 'the tiktok story'
-event = {'pathParameters':{'gameid':4}, 'body':{'challenge_type':challenge_type, 'challengeid':challengeid, 'answer':answer, 'playerid':playerid}} #CHANGE HERE TO TEST
-output = lambda_handler(event, {})
-print(output)

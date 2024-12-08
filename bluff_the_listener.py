@@ -217,14 +217,17 @@ def btl(articles):
     with open(prompt_file, 'r') as f:
         prompt = f.read()
 
-
+    # Grab the two real articles
     related, article_1, article_2, connection = get_two_articles(articles, prompt, groq_key, groq_model)
+
 
     prompt_file = config.get('news_sources', 'btl_summary_prompt')
     with open(prompt_file, 'r') as f:
         prompt = f.read()
     worldnews_key = config.get('news_sources', 'worldnews_key')
     worldnews_url = config.get('news_sources', 'worldnews_url')
+
+    # Generate descriptions for the two real articles
 
     summary_1 = generate_description(article_1, prompt, groq_key, groq_model, worldnews_url, worldnews_key)
     summary_2 = generate_description(article_2, prompt, groq_key, groq_model, worldnews_url, worldnews_key)
@@ -234,6 +237,7 @@ def btl(articles):
     with open(prompt_file, 'r') as f:
         prompt = f.read()
 
+    # Generate a fake description
     fake_summary = generate_fake(summary_1, summary_2, connection, prompt, groq_key, groq_model)
 
     prompt_file = config.get('news_sources', 'btl_intro_prompt')
@@ -251,6 +255,8 @@ def btl(articles):
 
     articles.remove(article_1)
     articles.remove(article_2)
+
+    # Get rid of the articles so they aren't used again in other games
 
     return {
 
