@@ -7,4 +7,4 @@
 
 <p>You can find more detailed information <a href=https://docs.google.com/document/d/1bwHtl38FcH62jV6vH7qICVCaZfiKGF8mojT1-8mPv4c/edit?usp=sharing>here</a>.</p>
 
-<p>Please send my way any feedback you have, positive or negative. I am particularly interested in feedback on my prompting. I have no background in prompt engineering, so I would be very grateful if someone who does could give me suggestions for improvement. I'll inlcude the prompt files below for convenience. </p>
+<p>Please send my way any feedback you have, positive or negative. I am particularly interested in feedback on my prompting. I have no background in prompt engineering, so I would be very grateful if someone who does could give me suggestions for improvement. </p>
