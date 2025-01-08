@@ -8,5 +8,5 @@ fib_prompt.txt
 readme.txt
 server_config.ini
 queries.sql
-main.py
-client-config.ini
+wwdtm-client/main.py
+wwdtm-client/client-config.ini
