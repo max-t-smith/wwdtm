@@ -1,3 +1,5 @@
+-- I included this in the Repo so those interested can get more info on how the DB is structured
+
 USE wwdtm_app;
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -94,20 +96,6 @@ CREATE TABLE quotes
 );
 
 
-DROP USER IF EXISTS 'wwdtmapp-read-only';
-DROP USER IF EXISTS 'wwdtmapp-read-write';
-
-
-CREATE USER 'wwdtmapp-read-only' IDENTIFIED BY 'abc123!!';
-CREATE USER 'wwdtmapp-read-write' IDENTIFIED BY 'def456!!';
-
-
-GRANT SELECT, SHOW VIEW ON wwdtm_app.*
-      TO 'wwdtmapp-read-only';
-GRANT SELECT, SHOW VIEW, INSERT, UPDATE, DELETE, DROP, CREATE, ALTER ON wwdtm_app.*
-      TO 'wwdtmapp-read-write';
-
-FLUSH PRIVILEGES;
 
 
 
