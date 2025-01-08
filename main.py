@@ -23,9 +23,10 @@ if response.status_code != 200:
     sys.exit(0)
 
 my_id = response.json()["id"]
+body = {"userid":my_id}
 
 # Request the game with the player's unique ID
-response = requests.get(api_endpoint+"/game/"+str(my_id))
+response = requests.post(api_endpoint+"/game", json=body)
 if response.status_code != 200:
     print(response.json())
     print("Sorry, we're having some server issues...try back later")

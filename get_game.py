@@ -20,7 +20,9 @@ def lambda_handler(event, context):
     if "body" not in event:
         return {'statusCode':400, 'body':'bad request: missing body'}
 
-    if 'userid' not in event['body']:
+    body = json.loads(event["body"])
+
+    if 'userid' not in body:
         return {'statusCode': 400, 'body': 'bad request: missing uid'}
 
     #
@@ -30,7 +32,7 @@ def lambda_handler(event, context):
 
     dbConn = datatier.get_dbConn(rds_endpoint, rds_portnum, rds_username, rds_pwd, rds_dbname)
 
-    userid = event['body']['userid']
+    userid = body['userid']
     sql = "select * from players where playerid = %s"
     row = datatier.retrieve_one_row(dbConn, sql, [userid])
 
