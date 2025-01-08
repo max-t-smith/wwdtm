@@ -2,6 +2,7 @@ import requests
 from configparser import ConfigParser
 import sys
 import time
+import textwrap
 
 # Parse the configuration file
 config = ConfigParser()
@@ -53,8 +54,9 @@ for quote in wbtt:
     quote_txt = '"'+quote["quote"]+'"'
     question = quote["question"]
     print()
-    print(quote_txt)
-    print(question)
+    print(textwrap.fill(quote_txt,width=100))
+    print()
+    print(textwrap.fill(question,width=100))
     print()
     answer = input()
     body = {"challenge_type":"wbtt","challengeid":id,"answer":answer, "playerid":my_id, "gameid":game_id}
@@ -76,13 +78,13 @@ for quote in wbtt:
         print("Sorry, that's not the right answer")
         print("The right answer was: ",correct_answer)
     print()
-    print(info)
+    print(textwrap.fill(info,width=100))
     print()
+    print("---------------------------")
 
 # Bluff the Listener Challenge
 
 id = btl["id"]
-print("----------------------------")
 print("Are you ready for the next game?")
 print()
 print("It's the Bluff the Listener challenge! I will tell you about three stories from recent news, but one is fake.")
@@ -91,7 +93,7 @@ print(btl["intro"])
 print("Are you ready?")
 input()
 for story in btl["summaries"]:
-    print(story)
+    print(textwrap.fill(story, width=100))
     print()
 print("Okay, which one do you think isn't real?")
 answer = input()
@@ -153,12 +155,12 @@ for limerick in llc:
         print("Sorry, that's not the right answer")
         print("The right answer was: ", correct_answer)
     print()
-    print(info)
+    print(textwrap.fill(info, width=100))
     print()
+    print("----------------------")
 
 # Lightning Fill In the Blank
 
-print("----------------------")
 print("Finally, it's time for the lightning fill-in-the-blank round!")
 print("")
 print("Answer as many questions about recent news as you can in 60 seconds")
@@ -170,7 +172,7 @@ start_time = time.time()
 for question in fib:
     print()
     id = question["id"]
-    print(question["question"])
+    print(textwrap.fill(question["question"],width=100))
     answer = input()
     body = {"challenge_type": "fitb", "challengeid": id, "answer": answer, "playerid": my_id, "gameid": game_id}
     response = requests.post(api_endpoint + "/answer", json=body)

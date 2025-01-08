@@ -17,8 +17,11 @@ def lambda_handler(event, context):
     rds_pwd = config.get('rds', 'user_pwd')
     rds_dbname = config.get('rds', 'db_name')
 
-    if 'pathParameters' not in event or 'userid' not in event['pathParameters']:
-        return({'statusCode':500, 'body':'player id not in path parameters'})
+    if "body" not in event:
+        return {'statusCode':400, 'body':'bad request: missing body'}
+
+    if 'userid' not in event['body']:
+        return {'statusCode': 400, 'body': 'bad request: missing uid'}
 
     #
     # open connection to the database:
@@ -27,7 +30,7 @@ def lambda_handler(event, context):
 
     dbConn = datatier.get_dbConn(rds_endpoint, rds_portnum, rds_username, rds_pwd, rds_dbname)
 
-    userid = event['pathParameters']['userid']
+    userid = event['body']['userid']
     sql = "select * from players where playerid = %s"
     row = datatier.retrieve_one_row(dbConn, sql, [userid])
 
